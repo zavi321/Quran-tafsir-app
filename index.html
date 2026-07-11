@@ -386,6 +386,8 @@ if ('serviceWorker' in navigator) {
 }
 
 async function prefetchAllSurahsForOffline(){
+  if (localStorage.getItem('tafaseer-offline-done') === 'true') return;
+
   const statusEl = document.getElementById('offlineStatus');
   const showStatus = (msg) => { if(statusEl){ statusEl.style.display='block'; statusEl.textContent = msg; } };
 
@@ -413,6 +415,7 @@ async function prefetchAllSurahsForOffline(){
     }
   }
   showStatus('✓ پوری ایپ (تمام تفاسیر) اب آف لائن دستیاب ہے');
+  localStorage.setItem('tafaseer-offline-done', 'true');
   setTimeout(() => { if(statusEl) statusEl.style.display = 'none'; }, 6000);
 }
 </script>
