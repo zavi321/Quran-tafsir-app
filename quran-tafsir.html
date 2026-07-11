@@ -1,0 +1,372 @@
+<!DOCTYPE html>
+<html lang="ur" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1, user-scalable=no">
+<title>قرآن کریم مع تفاسیر</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Amiri+Quran&family=Noto+Naskh+Arabic:wght@400;600&family=Noto+Nastaliq+Urdu:wght@400;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --teal-deep:#0E3B36;
+    --teal-mid:#154C45;
+    --parchment:#FBF3E1;
+    --parchment-soft:#F3E9D2;
+    --gold:#C6992D;
+    --gold-soft:#E4C878;
+    --maroon:#7A2430;
+    --ink:#221A10;
+    --ink-soft:#5A4A32;
+  }
+  *{box-sizing:border-box; -webkit-tap-highlight-color:transparent;}
+  html,body{margin:0;padding:0;}
+  body{
+    background:var(--teal-deep);
+    background-image:
+      radial-gradient(circle at 15% 8%, rgba(198,153,45,0.10), transparent 40%),
+      radial-gradient(circle at 85% 92%, rgba(198,153,45,0.08), transparent 45%);
+    color:var(--ink);
+    font-family:'Noto Nastaliq Urdu', serif;
+    min-height:100vh;
+    padding-bottom:40px;
+  }
+  ::selection{background:var(--gold-soft);}
+
+  /* ===== Header ===== */
+  header{
+    background:linear-gradient(180deg, var(--teal-deep), var(--teal-mid));
+    padding:22px 16px 18px;
+    text-align:center;
+    border-bottom:2px solid var(--gold);
+    position:sticky; top:0; z-index:30;
+  }
+  .brand{
+    color:var(--gold-soft);
+    font-size:26px;
+    font-weight:700;
+    letter-spacing:0.5px;
+    margin:0 0 4px;
+  }
+  .brand-sub{
+    color:#CFE3DF;
+    font-size:13px;
+    font-family:'Noto Nastaliq Urdu', serif;
+    opacity:0.85;
+    margin:0 0 14px;
+  }
+  .ornament{
+    width:120px; height:14px; margin:0 auto 14px;
+    opacity:0.9;
+  }
+  select#surahSelect{
+    width:100%;
+    max-width:420px;
+    padding:12px 14px;
+    border-radius:10px;
+    border:1.5px solid var(--gold);
+    background:var(--parchment);
+    color:var(--ink);
+    font-family:'Noto Nastaliq Urdu', serif;
+    font-size:16px;
+    appearance:none;
+    text-align:center;
+  }
+
+  /* ===== Surah title band ===== */
+  .surah-band{
+    max-width:640px;
+    margin:18px auto 8px;
+    padding:16px 20px;
+    text-align:center;
+  }
+  .surah-band .ar-name{
+    font-family:'Amiri Quran', serif;
+    color:var(--gold-soft);
+    font-size:34px;
+    margin:0 0 6px;
+  }
+  .surah-band .meta{
+    color:#CFE3DF;
+    font-size:14px;
+    display:flex; justify-content:center; gap:10px; flex-wrap:wrap;
+  }
+  .tag{
+    border:1px solid var(--gold);
+    border-radius:20px;
+    padding:2px 12px;
+    color:var(--gold-soft);
+  }
+
+  /* ===== Ayah list ===== */
+  main{max-width:640px; margin:0 auto; padding:6px 12px 24px;}
+  .ayah-card{
+    background:var(--parchment);
+    border:1px solid #E3D3A9;
+    border-radius:14px;
+    margin:12px 0;
+    padding:18px 16px 14px;
+    box-shadow:0 3px 10px rgba(0,0,0,0.18);
+    transition:box-shadow .2s ease;
+  }
+  .ayah-card.open{ box-shadow:0 6px 18px rgba(0,0,0,0.28); border-color:var(--gold);}
+  .ayah-arabic-wrap{
+    display:flex; align-items:flex-start; gap:10px; cursor:pointer;
+  }
+  .ayah-num{
+    flex:0 0 auto;
+    width:34px; height:34px;
+    border-radius:50%;
+    background:var(--teal-deep);
+    border:1.5px solid var(--gold);
+    color:var(--gold-soft);
+    display:flex; align-items:center; justify-content:center;
+    font-family:'Noto Nastaliq Urdu', serif;
+    font-size:14px;
+    margin-top:4px;
+  }
+  .ayah-arabic{
+    font-family:'Amiri Quran', serif;
+    font-size:26px;
+    line-height:2.15;
+    color:var(--ink);
+    text-align:justify;
+    flex:1;
+  }
+  .chevron{
+    flex:0 0 auto;
+    color:var(--maroon);
+    font-size:14px;
+    margin-top:8px;
+    transition:transform .25s ease;
+  }
+  .ayah-card.open .chevron{ transform:rotate(180deg); }
+
+  .ayah-body{
+    display:none;
+    margin-top:14px;
+    border-top:1px dashed #D8C58F;
+    padding-top:12px;
+  }
+  .ayah-card.open .ayah-body{ display:block; }
+
+  .translation{
+    font-size:17px;
+    line-height:2;
+    color:var(--maroon);
+    margin-bottom:14px;
+  }
+  .translation-label, .tafsir-label{
+    font-size:12px;
+    color:var(--ink-soft);
+    margin-bottom:4px;
+    opacity:0.75;
+  }
+
+  .tafsir-tabs{
+    display:flex; gap:8px; overflow-x:auto;
+    padding-bottom:8px; margin-bottom:10px;
+    scrollbar-width:thin;
+  }
+  .tafsir-tab{
+    flex:0 0 auto;
+    font-family:'Noto Nastaliq Urdu', serif;
+    font-size:14px;
+    padding:7px 14px;
+    border-radius:20px;
+    border:1.3px solid var(--teal-mid);
+    background:transparent;
+    color:var(--teal-mid);
+    cursor:pointer;
+    white-space:nowrap;
+  }
+  .tafsir-tab.active{
+    background:var(--teal-deep);
+    color:var(--gold-soft);
+    border-color:var(--teal-deep);
+  }
+  .tafsir-content{
+    font-size:16px;
+    line-height:2.1;
+    color:var(--ink);
+    min-height:24px;
+  }
+  .tafsir-content.loading{ color:var(--ink-soft); font-size:14px;}
+  .tafsir-content[dir="ltr"]{ font-family:'Georgia', serif; line-height:1.8; text-align:left; }
+  .tafsir-content.arabic-text{ font-family:'Noto Naskh Arabic', serif; line-height:2; font-size:17px; text-align:justify; }
+
+  footer{
+    max-width:640px; margin:20px auto 0; padding:14px 20px 0;
+    text-align:center; color:#BFDAD4; font-size:12px; line-height:1.9;
+  }
+  footer .src{color:var(--gold-soft);}
+
+  .loadmsg{ text-align:center; color:var(--gold-soft); padding:30px; font-size:15px;}
+</style>
+</head>
+<body>
+
+<header>
+  <p class="brand">قرآن کریم مع تفاسیر</p>
+  <p class="brand-sub">آیت پر کلک کریں — ترجمہ اور آٹھ تفاسیر (اردو، عربی، انگریزی) دیکھیں</p>
+  <svg class="ornament" viewBox="0 0 120 14"><line x1="0" y1="7" x2="45" y2="7" stroke="#C6992D" stroke-width="1"/><circle cx="60" cy="7" r="5" fill="none" stroke="#C6992D" stroke-width="1.3"/><circle cx="60" cy="7" r="1.6" fill="#C6992D"/><line x1="75" y1="7" x2="120" y2="7" stroke="#C6992D" stroke-width="1"/></svg>
+  <select id="surahSelect"><option>سورتیں لوڈ ہو رہی ہیں...</option></select>
+</header>
+
+<div class="surah-band" id="surahBand" style="display:none">
+  <p class="ar-name" id="surahArabic"></p>
+  <div class="meta">
+    <span class="tag" id="surahUrduName"></span>
+    <span class="tag" id="surahType"></span>
+    <span class="tag" id="surahCount"></span>
+  </div>
+</div>
+
+<main id="ayahList">
+  <p class="loadmsg">قرآن پاک لوڈ ہو رہا ہے...</p>
+</main>
+
+<footer>
+  عربی متن، اردو ترجمہ (مولانا مودودی) اور تفاسیر آزاد وسائل <span class="src">(quran-json, tafsir_api)</span> سے حاصل کی گئی ہیں۔<br>
+  یہ ایک پروٹوٹائپ ہے — موبائل پر براؤزر کے "Add to Home Screen" آپشن سے ایپ کی طرح انسٹال کریں۔
+</footer>
+
+<script>
+const TAFSIRS = [
+  {slug:'tafseer-ibn-e-kaseer-urdu', name:'ابن کثیر (اردو)', dir:'rtl', lang:'ur'},
+  {slug:'tafsir-bayan-ul-quran', name:'بیان القرآن', dir:'rtl', lang:'ur'},
+  {slug:'tazkiru-quran-ur', name:'تذکیر القرآن', dir:'rtl', lang:'ur'},
+  {slug:'ur-tafsir-as-saadi-urdu', name:'تفسیر السعدی (اردو)', dir:'rtl', lang:'ur'},
+  {slug:'en-tafsir-maarif-ul-quran', name:'معارف القرآن (English)', dir:'ltr', lang:'en'},
+  {slug:'ar-tafsir-ibn-kathir', name:'ابن کثیر (عربی)', dir:'rtl', lang:'ar'},
+  {slug:'ar-tafsir-al-jalalayn', name:'جلالین (عربی)', dir:'rtl', lang:'ar'},
+  {slug:'ar-tafseer-al-qurtubi', name:'قرطبی (عربی)', dir:'rtl', lang:'ar'},
+];
+
+const TAFSIR_BASE = 'https://cdn.jsdelivr.net/gh/spa5k/tafsir_api@main/tafsir';
+const QURAN_INDEX = 'https://cdn.jsdelivr.net/npm/quran-json@3.1.2/dist/chapters/ur/index.json';
+const QURAN_CHAPTER = (n) => `https://cdn.jsdelivr.net/npm/quran-json@3.1.2/dist/chapters/ur/${n}.json`;
+
+const tafsirCache = {}; // key: slug-surah-ayah
+
+let surahIndex = [];
+
+async function init(){
+  try{
+    const res = await fetch(QURAN_INDEX);
+    surahIndex = await res.json();
+    const sel = document.getElementById('surahSelect');
+    sel.innerHTML = surahIndex.map(s =>
+      `<option value="${s.id}">${s.id}. ${s.transliteration} — ${s.translation}</option>`
+    ).join('');
+    sel.addEventListener('change', () => loadSurah(parseInt(sel.value)));
+    loadSurah(1);
+  }catch(e){
+    document.getElementById('ayahList').innerHTML = '<p class="loadmsg">سورتوں کی فہرست لوڈ نہیں ہو سکی۔ انٹرنیٹ کنکشن چیک کریں۔</p>';
+  }
+}
+
+async function loadSurah(num){
+  const list = document.getElementById('ayahList');
+  list.innerHTML = '<p class="loadmsg">لوڈ ہو رہا ہے...</p>';
+  document.getElementById('surahSelect').value = num;
+  try{
+    const res = await fetch(QURAN_CHAPTER(num));
+    const data = await res.json();
+    const meta = surahIndex.find(s => s.id === num) || {};
+
+    document.getElementById('surahBand').style.display = 'block';
+    document.getElementById('surahArabic').textContent = data.name;
+    document.getElementById('surahUrduName').textContent = data.translation;
+    document.getElementById('surahType').textContent = data.type === 'meccan' ? 'مکی' : 'مدنی';
+    document.getElementById('surahCount').textContent = data.total_verses + ' آیات';
+
+    list.innerHTML = '';
+    data.verses.forEach(v => list.appendChild(buildAyahCard(num, v)));
+    window.scrollTo({top:0, behavior:'smooth'});
+  }catch(e){
+    list.innerHTML = '<p class="loadmsg">سورت لوڈ نہیں ہو سکی۔ دوبارہ کوشش کریں۔</p>';
+  }
+}
+
+function buildAyahCard(surahNum, verse){
+  const card = document.createElement('div');
+  card.className = 'ayah-card';
+
+  const head = document.createElement('div');
+  head.className = 'ayah-arabic-wrap';
+  head.innerHTML = `
+    <span class="ayah-num">${verse.id}</span>
+    <span class="ayah-arabic">${verse.text}</span>
+    <span class="chevron">▾</span>
+  `;
+
+  const body = document.createElement('div');
+  body.className = 'ayah-body';
+  body.innerHTML = `
+    <p class="translation-label">اردو ترجمہ</p>
+    <p class="translation">${verse.translation}</p>
+    <p class="tafsir-label">تفسیر منتخب کریں</p>
+    <div class="tafsir-tabs">
+      ${TAFSIRS.map((t,i) => `<button class="tafsir-tab${i===0?' active':''}" data-i="${i}">${t.name}</button>`).join('')}
+    </div>
+    <div class="tafsir-content loading">تفسیر منتخب کرنے پر یہاں ظاہر ہو گی...</div>
+  `;
+
+  head.addEventListener('click', () => {
+    const wasOpen = card.classList.contains('open');
+    card.classList.toggle('open');
+    if(!wasOpen && !card.dataset.loaded){
+      card.dataset.loaded = '1';
+      loadTafsir(card, surahNum, verse.id, 0);
+    }
+  });
+
+  body.querySelectorAll('.tafsir-tab').forEach(btn => {
+    btn.addEventListener('click', () => {
+      body.querySelectorAll('.tafsir-tab').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      loadTafsir(card, surahNum, verse.id, parseInt(btn.dataset.i));
+    });
+  });
+
+  card.appendChild(head);
+  card.appendChild(body);
+  return card;
+}
+
+async function loadTafsir(card, surahNum, ayahNum, tafsirIdx){
+  const t = TAFSIRS[tafsirIdx];
+  const contentEl = card.querySelector('.tafsir-content');
+  const key = `${t.slug}-${surahNum}-${ayahNum}`;
+  contentEl.className = 'tafsir-content loading';
+  contentEl.removeAttribute('dir');
+  contentEl.textContent = 'تفسیر لوڈ ہو رہی ہے...';
+
+  if(tafsirCache[key]){
+    renderTafsir(contentEl, tafsirCache[key], t);
+    return;
+  }
+  try{
+    const url = `${TAFSIR_BASE}/${t.slug}/${surahNum}/${ayahNum}.json`;
+    const res = await fetch(url);
+    if(!res.ok) throw new Error('not found');
+    const data = await res.json();
+    const text = (data.text || '').trim();
+    tafsirCache[key] = text || 'اس آیت کے لیے تفسیر دستیاب نہیں۔';
+    renderTafsir(contentEl, tafsirCache[key], t);
+  }catch(e){
+    renderTafsir(contentEl, 'یہ تفسیر اس آیت کے لیے فی الحال دستیاب نہیں ہو سکی۔', t);
+  }
+}
+
+function renderTafsir(el, text, t){
+  el.className = 'tafsir-content' + (t.lang === 'ar' ? ' arabic-text' : '');
+  el.setAttribute('dir', t.dir);
+  el.textContent = text;
+}
+
+init();
+</script>
+</body>
+</html>
