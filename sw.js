@@ -22,17 +22,15 @@ self.addEventListener('fetch', (e) => {
   const isData = url.includes('jsdelivr.net');
 
   if (isData) {
-    // Data (Quran text + Tafsir): cache-first, save network response for offline use later
+    // Data (Quran text + Tafsir): cache-first — once saved, never fetched again
     e.respondWith(
       caches.open(CACHE_NAME).then((cache) =>
         cache.match(e.request).then((cached) => {
-          const fetchPromise = fetch(e.request)
-            .then((response) => {
-              if (response && response.ok) cache.put(e.request, response.clone());
-              return response;
-            })
-            .catch(() => cached);
-          return cached || fetchPromise;
+          if (cached) return cached;
+          return fetch(e.request).then((response) => {
+            if (response && response.ok) cache.put(e.request, response.clone());
+            return response;
+          });
         })
       )
     );
