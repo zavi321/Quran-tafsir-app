@@ -1,4 +1,4 @@
-const CACHE_NAME = 'tafaseer-cache-v1';
+const CACHE_NAME = 'tafaseer-cache-v2';
 const APP_SHELL = ['./', './index.html', './manifest.json', './icon-192.png', './icon-512.png'];
 
 self.addEventListener('install', (e) => {
@@ -22,7 +22,6 @@ self.addEventListener('fetch', (e) => {
   const isData = url.includes('jsdelivr.net');
 
   if (isData) {
-    // Data (Quran text + Tafsir): cache-first — once saved, never fetched again
     e.respondWith(
       caches.open(CACHE_NAME).then((cache) =>
         cache.match(e.request).then((cached) => {
@@ -37,8 +36,14 @@ self.addEventListener('fetch', (e) => {
     return;
   }
 
-  // App shell: cache-first, fallback to network
   e.respondWith(
-    caches.match(e.request).then((cached) => cached || fetch(e.request))
+    fetch(e.request)
+      .then((response) => {
+        if (response && response.ok) {
+          caches.open(CACHE_NAME).then((cache) => cache.put(e.request, response.clone()));
+        }
+        return response;
+      })
+      .catch(() => caches.match(e.request))
   );
 });
