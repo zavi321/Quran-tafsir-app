@@ -1,4 +1,4 @@
-const CACHE_NAME = 'tafaseer-cache-v2';
+const CACHE_NAME = 'tafaseer-cache-v3';
 const APP_SHELL = ['./', './index.html', './manifest.json', './icon-192.png', './icon-512.png'];
 
 self.addEventListener('install', (e) => {
@@ -22,6 +22,7 @@ self.addEventListener('fetch', (e) => {
   const isData = url.includes('jsdelivr.net');
 
   if (isData) {
+    // Data (Quran text + Tafsir): cache-first — once saved, never fetched again
     e.respondWith(
       caches.open(CACHE_NAME).then((cache) =>
         cache.match(e.request).then((cached) => {
@@ -36,6 +37,8 @@ self.addEventListener('fetch', (e) => {
     return;
   }
 
+  // App shell (index.html, css, etc.): network-first, so code updates always
+  // apply on the next visit — falls back to cache only when offline.
   e.respondWith(
     fetch(e.request)
       .then((response) => {
